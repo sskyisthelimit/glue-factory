@@ -48,8 +48,7 @@ class HomographyDataset(BaseDataset):
     default_conf = {
         # image search
         "data_dir": "revisitop1m",  # the top-level directory
-        "image_dir": "jpg/",  # the subdirectory with the images
-        "image_list": "revisitop1m.txt",  # optional: list or filename of list
+        "image_list": None,  # optional: list or filename of list
         "glob": ["*.jpg", "*.png", "*.jpeg", "*.JPG", "*.PNG"],
         # splits
         "train_size": 100,
@@ -87,13 +86,9 @@ class HomographyDataset(BaseDataset):
     def _init(self, conf):
         data_dir = DATA_PATH / conf.data_dir
         if not data_dir.exists():
-            if conf.data_dir == "revisitop1m":
-                logger.info("Downloading the revisitop1m dataset.")
-                self.download_revisitop1m()
-            else:
-                raise FileNotFoundError(data_dir)
+            raise FileNotFoundError(data_dir)
 
-        image_dir = data_dir / conf.image_dir
+        image_dir = data_dir
         images = []
         if conf.image_list is None:
             glob = [conf.glob] if isinstance(conf.glob, str) else conf.glob
@@ -127,26 +122,6 @@ class HomographyDataset(BaseDataset):
         val_images = images[conf.train_size : conf.train_size + conf.val_size]
         self.images = {"train": train_images, "val": val_images}
 
-    def download_revisitop1m(self):
-        data_dir = DATA_PATH / self.conf.data_dir
-        tmp_dir = data_dir.parent / "revisitop1m_tmp"
-        if tmp_dir.exists():  # The previous download failed.
-            shutil.rmtree(tmp_dir)
-        image_dir = tmp_dir / self.conf.image_dir
-        image_dir.mkdir(exist_ok=True, parents=True)
-        num_files = 100
-        url_base = "http://ptak.felk.cvut.cz/revisitop/revisitop1m/"
-        list_name = "revisitop1m.txt"
-        torch.hub.download_url_to_file(url_base + list_name, tmp_dir / list_name)
-        for n in tqdm(range(num_files), position=1):
-            tar_name = "revisitop1m.{}.tar.gz".format(n + 1)
-            tar_path = image_dir / tar_name
-            torch.hub.download_url_to_file(url_base + "jpg/" + tar_name, tar_path)
-            with tarfile.open(tar_path) as tar:
-                tar.extractall(path=image_dir)
-            tar_path.unlink()
-        shutil.move(tmp_dir, data_dir)
-
     def get_dataset(self, split):
         return _Dataset(self.conf, self.images[split], split)
 
@@ -156,7 +131,7 @@ class _Dataset(torch.utils.data.Dataset):
         self.conf = conf
         self.split = split
         self.image_names = np.array(image_names)
-        self.image_dir = DATA_PATH / conf.data_dir / conf.image_dir
+        self.image_dir = DATA_PATH / conf.data_dir
 
         aug_conf = conf.photometric
         aug_name = aug_conf.name
