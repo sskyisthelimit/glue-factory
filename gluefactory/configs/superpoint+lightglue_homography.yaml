@@ -1,10 +1,22 @@
 data:
     name: homographies
-    data_dir: revisitop1m
-    train_size: 150000
-    val_size: 2000
-    batch_size: 128
-    num_workers: 14
+    data_dir: step1-matching-train/step1-matching-train
+    train_size: 16560
+    val_size: 0
+    batch_size: 64
+    num_workers: 4
+    homography:
+        difficulty: 0.7
+        max_angle: 45
+    photometric:
+        name: lg
+data_val:
+    name: homographies
+    data_dir: first-step-val-dataset/first_step_val_dataset
+    train_size: 0
+    val_size: 1656
+    batch_size: 64
+    num_workers: 4
     homography:
         difficulty: 0.7
         max_angle: 45
@@ -30,18 +42,14 @@ model:
         checkpointed: true
 train:
     seed: 0
-    epochs: 40
+    epochs: 5
     log_every_iter: 100
     eval_every_iter: 500
-    lr: 1e-4
+    lr: 5e-5
     lr_schedule:
         start: 20
         type: exp
         on_epoch: true
         exp_div_10: 10
     plot: [5, 'gluefactory.visualization.visualize_batch.make_match_figures']
-benchmarks:
-    hpatches:
-      eval:
-        estimator: opencv
-        ransac_th: 0.5
+

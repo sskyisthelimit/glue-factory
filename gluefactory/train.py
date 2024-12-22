@@ -61,7 +61,7 @@ default_train_conf = {
     "log_every_iter": 200,  # interval for logging the loss to the console
     "log_grad_every_iter": None,  # interval for logging gradient hists
     "test_every_epoch": 1,  # interval for evaluation on the test benchmarks
-    "keep_last_checkpoints": 10,  # keep only the last X checkpoints
+    "keep_last_checkpoints": 2,  # keep only the last X checkpoints
     "load_experiment": None,  # initialize the model from a previous experiment
     "median_metrics": [],  # add the median of some metrics
     "recall_metrics": {},  # add the recall of some metrics
@@ -647,9 +647,9 @@ if __name__ == "__main__":
         type=str,
         choices=["default", "reduce-overhead", "max-autotune"],
     )
-    parser.add_argument("--overfit", action="store_true")
+    parser.add_argument("--overfit", action="store_false")
     parser.add_argument("--restore", action="store_true")
-    parser.add_argument("--distributed", action="store_true")
+    parser.add_argument("--distributed", action="store_false")
     parser.add_argument("--profile", action="store_true")
     parser.add_argument("--print_arch", "--pa", action="store_true")
     parser.add_argument("--detect_anomaly", "--da", action="store_true")
