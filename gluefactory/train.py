@@ -647,7 +647,7 @@ if __name__ == "__main__":
         type=str,
         choices=["default", "reduce-overhead", "max-autotune"],
     )
-    parser.add_argument("--overfit", action="store_false")
+    parser.add_argument("--overfit", action="store_true")
     parser.add_argument("--restore", action="store_true")
     parser.add_argument("--distributed", action="store_false")
     parser.add_argument("--profile", action="store_true")
