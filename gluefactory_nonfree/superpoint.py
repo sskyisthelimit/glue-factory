@@ -169,7 +169,7 @@ class SuperPoint(BaseModel):
     }
     required_data_keys = ["image"]
 
-    checkpoint_url = "https://github.com/magicleap/SuperGluePretrainedNetwork/raw/master/models/weights/superpoint_v1.pth"  # noqa: E501
+    checkpoint_path = "/kaggle/input/notebookc384304bc6/logs/superpoint_coco/checkpoints/superPointNet_18500_checkpoint.pth.tar"
 
     def _init(self, conf):
         self.relu = nn.ReLU(inplace=True)
@@ -195,10 +195,14 @@ class SuperPoint(BaseModel):
                 c5, conf.descriptor_dim, kernel_size=1, stride=1, padding=0
             )
 
-        self.load_state_dict(
-            torch.hub.load_state_dict_from_url(str(self.checkpoint_url)), strict=False
-        )
-
+        checkpoint = torch.load(conf.get("ckpt_path"),
+                                map_location=torch.device("cpu"))
+        if "model_state_dict" in checkpoint:
+            filtered_state_dict = {k: v for k, v in checkpoint['model_state_dict'].items() if not k.startswith("bn")}
+            self.load_state_dict(filtered_state_dict)
+        else:
+            self.load_state_dict(checkpoint)
+            
     def _forward(self, data):
         image = data["image"]
         if image.shape[1] == 3:  # RGB
