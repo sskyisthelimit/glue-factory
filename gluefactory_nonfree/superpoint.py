@@ -169,7 +169,7 @@ class SuperPoint(BaseModel):
     }
     required_data_keys = ["image"]
 
-    checkpoint_path = "/kaggle/input/notebookc384304bc6/logs/superpoint_coco/checkpoints/superPointNet_18500_checkpoint.pth.tar"
+    checkpoint_path = "/kaggle/working/checkpoint.pth.tar"
 
     def _init(self, conf):
         self.relu = nn.ReLU(inplace=True)
@@ -202,7 +202,7 @@ class SuperPoint(BaseModel):
             self.load_state_dict(filtered_state_dict)
         else:
             self.load_state_dict(checkpoint)
-            
+
     def _forward(self, data):
         image = data["image"]
         if image.shape[1] == 3:  # RGB
