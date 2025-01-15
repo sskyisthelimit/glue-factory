@@ -169,9 +169,11 @@ class SuperPoint(BaseModel):
     }
     required_data_keys = ["image"]
 
-    checkpoint_path = "/kaggle/working/checkpoint.pth.tar"
-
-    def _init(self, conf):
+    def _init(self,
+              conf,
+              checkpoint_path="/kaggle/working/checkpoint.pth.tar"
+              ):
+        
         self.relu = nn.ReLU(inplace=True)
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
         c1, c2, c3, c4, c5 = 64, 64, 128, 128, 256
@@ -195,7 +197,7 @@ class SuperPoint(BaseModel):
                 c5, conf.descriptor_dim, kernel_size=1, stride=1, padding=0
             )
 
-        checkpoint = torch.load(conf.get("ckpt_path"),
+        checkpoint = torch.load(checkpoint_path,
                                 map_location=torch.device("cpu"))
         if "model_state_dict" in checkpoint:
             filtered_state_dict = {k: v for k, v in checkpoint['model_state_dict'].items() if not k.startswith("bn")}
